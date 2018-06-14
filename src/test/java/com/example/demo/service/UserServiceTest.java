@@ -10,9 +10,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
+import java.util.Collections;
+import java.util.Optional;
+import java.util.UUID;
 
 @RunWith(MockitoJUnitRunner.class)
 public class UserServiceTest {
@@ -88,18 +93,50 @@ public class UserServiceTest {
 
 
     @Test
-    public void findById() {
+    public void findById() throws BadRequestException, UserNotFound {
+        UUID randomUUID = UUID.randomUUID();
+        User user = new User().setId(randomUUID);
+        when(repository.findById(randomUUID)).thenReturn(Optional.of(user));
+        assertThat(service.findById(randomUUID)).isEqualTo(user);
+        verify(repository).findById(randomUUID);
+    }
+
+    @Test(expected = UserNotFound.class)
+    public void findByIdNotFound() throws UserNotFound {
+        when(repository.findById(any(UUID.class))).thenReturn(Optional.empty());
+        service.findById(UUID.randomUUID());
     }
 
     @Test
     public void findAll() {
+        when(repository.findAll()).thenReturn(Collections.EMPTY_LIST);
+        assertThat(service.findAll()).isEmpty();
     }
 
     @Test
     public void update() {
+        UUID uuid = UUID.randomUUID();
+        User user = new User()
+                .setId(uuid)
+                .setName("name").setEmail("mail@mail.com").setCpf("11111111111")
+                .setBirthDate(LocalDate.of(1998, 10, 9));
+        when(repository.save(user)).thenReturn(user);
+        assertThat(service.update(user)).isEqualTo(user);
+        verify(repository).save(user);
     }
 
     @Test
-    public void delete() {
+    public void delete() throws UserNotFound {
+        UUID randomUUID = UUID.randomUUID();
+        User user = new User().setId(randomUUID);
+        when(repository.findById(randomUUID)).thenReturn(Optional.of(user));
+        service.delete(randomUUID);
+        verify(repository).delete(user);
+    }
+
+    @Test(expected = UserNotFound.class)
+    public void deleteNotFound() throws UserNotFound {
+        when(repository.findById(any(UUID.class))).thenReturn(Optional.empty());
+        service.delete(UUID.randomUUID());
     }
 }
