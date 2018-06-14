@@ -1,20 +1,20 @@
-#Mutation tests demo
+# Mutation tests demo
 
 Example of how to use the pit tests framework to generate mutation coverage.
 
-##Build
+## Build
 
 ``` 
 mvn clean install
 ```
 
-##Clover 
+## Clover 
 
 ``` 
 target/.clover/report/index.html
 ```
 
-##Mutation
+## Mutation
 
 ``` 
 target/pit-reports/*/index.html
