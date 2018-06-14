@@ -37,7 +37,7 @@ public class UserService {
 
         validateRequiredField(user.getBirthDate(), "birthDate");
         if (Period.between(user.getBirthDate(), LocalDate.now()).getYears() < 18) {
-            throw new InvalidAgeException("Age must be greater than 18 years old");
+            throw new InvalidAgeException("Age must be greater than 18");
         }
 
         return repository.save(user);

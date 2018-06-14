@@ -22,6 +22,12 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>1.8</java.version>
+		<maven.compiler.target>1.8</maven.compiler.target>
+		<java.version>1.8</java.version>
+		<spring.boot.version>2.0.2.RELEASE</spring.boot.version>
+		<clover.version>4.2.1</clover.version>
+		<clover.default.db.dir>${project.basedir}/.clover/db/clover.db</clover.default.db.dir>
+		<clover.default.output.dir>${project.basedir}/.clover/report</clover.default.output.dir>
 	</properties>
 
 	<dependencies>
@@ -48,6 +54,12 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.assertj</groupId>
+			<artifactId>assertj-core</artifactId>
+			<version>3.10.0</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -55,6 +67,52 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.openclover</groupId>
+				<artifactId>clover-maven-plugin</artifactId>
+				<version>${clover.version}</version>
+				<configuration>
+					<targetPercentage>0%</targetPercentage>
+					<cloverDatabase>${project.basedir}/target/.clover/db/clover.db</cloverDatabase>
+					<cloverMergeDatabase>${project.basedir}/target/.clover/merge/cloverMerge.db
+					</cloverMergeDatabase>
+					<contextFilters>iflog,log</contextFilters>
+					<outputDirectory>${project.basedir}/target/.clover/report</outputDirectory>
+					<includesTestSourceRoots>false</includesTestSourceRoots>
+					<statementContexts>
+						<log>System.out.println\(.*\);</log>
+						<iflog>if.*\(LOG\.is.*\.*</iflog>
+					</statementContexts>
+				</configuration>
+				<executions>
+					<execution>
+						<id>main</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>instrument</goal>
+							<goal>aggregate</goal>
+							<goal>check</goal>
+							<goal>clover</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.pitest</groupId>
+				<artifactId>pitest-maven</artifactId>
+				<version>1.4.0</version>
+				<executions>
+					<execution>
+						<phase>test</phase>
+						<goals>
+							<goal>mutationCoverage</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<coverageThreshold>18</coverageThreshold>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
